@@ -1,6 +1,7 @@
 package com.demo.controller;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.demo.entity.Category;
+
+import com.demo.categorydto.CategoryDto;
+import com.demo.categorydto.CategoryResponse;
 import com.demo.service.CategoryService;
 
 @RestController
@@ -21,10 +24,10 @@ public class CategoryController
 	private CategoryService  CategoryService;
 	
 	@PostMapping("/savecategory")
-	public ResponseEntity<?> saveCategory(@RequestBody Category category)
+	public ResponseEntity<?> saveCategory(@RequestBody CategoryDto categoryDto)
 	{
 		
-		Boolean saveCategory = CategoryService.saveCategory(category);
+		Boolean saveCategory = CategoryService.saveCategory(categoryDto);
 		if(saveCategory) {
 		return new ResponseEntity<>("saved success",HttpStatus.CREATED);
 	    }
@@ -36,7 +39,21 @@ public class CategoryController
 	@GetMapping("/getcategory")
 	public ResponseEntity<?> getAllCategory()
 	{
-		List<Category> allCategory = CategoryService.getAllCategory();
+		List<CategoryDto> allCategory = CategoryService.getAllCategory();
+		if(CollectionUtils.isEmpty(allCategory))
+		{
+			return ResponseEntity.noContent().build();
+		}
+		else 
+		{
+			return new ResponseEntity<>(allCategory, HttpStatus.OK);
+		}
+	}
+	
+	@GetMapping("/active-category")
+	public ResponseEntity<?> getActiveCategory()
+	{
+		List<CategoryResponse> allCategory = CategoryService.getActiveCategory();
 		if(CollectionUtils.isEmpty(allCategory))
 		{
 			return ResponseEntity.noContent().build();

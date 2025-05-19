@@ -2,9 +2,14 @@ package com.demo.service.impl;
 
 import java.util.Date;
 import java.util.List;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
+import com.demo.categorydto.CategoryDto;
+import com.demo.categorydto.CategoryResponse;
 import com.demo.entity.Category;
 import com.demo.repository.CategoryRepository;
 import com.demo.service.CategoryService;
@@ -14,10 +19,21 @@ public class CategoryServiceImpl implements CategoryService {
 	
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private ModelMapper mapper;
 
 	@Override
-	public Boolean saveCategory(Category category) 
-	{
+	public Boolean saveCategory(CategoryDto categoryDto) 
+	{ 
+//		
+//		Category category = new Category();
+//		category.setName(categoryDto.getName());
+//		category.setDescription(categoryDto.getDescription());
+//		category.setIsActive(categoryDto.getIsActive());
+		
+		Category category = mapper.map(categoryDto, Category.class);
+		
 		category.setIsDeleted(false);
 		category.setCreatedBy(1);
 		category.setCreatedOn(new Date());
@@ -30,10 +46,19 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public List<Category> getAllCategory() 
+	public List<CategoryDto> getAllCategory() 
 	{
 		List<Category> all = categoryRepository.findAll();
-		return all;
+		List<CategoryDto> list = all.stream().map(cat->mapper.map(cat, CategoryDto.class)).toList();
+		return list;
+	}
+
+	@Override
+	public List<CategoryResponse> getActiveCategory() 
+	{
+		List<Category> category = categoryRepository.findByIsActiveTrue();
+		List<CategoryResponse> list = category.stream().map(cat->mapper.map(cat, CategoryResponse.class)).toList();
+		return list;
 	}
 
 }
