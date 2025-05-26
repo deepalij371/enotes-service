@@ -3,12 +3,10 @@ package com.demo.service.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-
 import com.demo.categorydto.CategoryDto;
 import com.demo.categorydto.CategoryResponse;
 import com.demo.entity.Category;
@@ -35,15 +33,37 @@ public class CategoryServiceImpl implements CategoryService {
 		
 		Category category = mapper.map(categoryDto, Category.class);
 		
-		category.setIsDeleted(false);
-		category.setCreatedBy(1);
-		category.setCreatedOn(new Date());
+		
+		if(ObjectUtils.isEmpty(category.getId()))
+		{
+			category.setIsDeleted(false);
+			category.setCreatedBy(1);
+			category.setCreatedOn(new Date());
+		}
+		else {
+			updateCategory(category);
+		}
+		
 		Category save = categoryRepository.save(category);
 		if(ObjectUtils.isEmpty(save))
 		{
 			return false;
 		}
 		return true;
+	}
+
+	private void updateCategory(Category category) {
+		
+		Optional<Category> findbyId = categoryRepository.findById(category.getId());
+		if(findbyId.isPresent())
+		{
+			Category category2 = findbyId.get();
+			category.setCreatedBy(category2.getCreatedBy());
+			category.setCreatedOn(category2.getCreatedOn());
+			category.setIsDeleted(category2.getIsDeleted());
+			category.setUpdatedBy(1);
+			category.setUpdatedOn(new Date());
+		}
 	}
 
 	@Override
