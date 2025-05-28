@@ -3,13 +3,16 @@ package com.demo.service.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
 import com.demo.categorydto.CategoryDto;
 import com.demo.categorydto.CategoryResponse;
 import com.demo.entity.Category;
+import com.demo.exception.ResourceNotFoundException;
 import com.demo.repository.CategoryRepository;
 import com.demo.service.CategoryService;
 
@@ -84,15 +87,18 @@ public class CategoryServiceImpl implements CategoryService {
 
 	
 	@Override
-	public CategoryDto getCategoryById(Integer id) 
+	public CategoryDto getCategoryById(Integer id) throws Exception
 	{
-		Optional<Category> findByCategory = categoryRepository.findByIdAndIsDeletedFalse(id);
+		Category category = categoryRepository.findByIdAndIsDeletedFalse(id).orElseThrow(()->new ResourceNotFoundException("Category not found"+id));
 		
-		if(findByCategory.isPresent()) 
+		if(ObjectUtils.isEmpty(category))
 		{
-			Category category = findByCategory.get();
+//			if(category.getName() == null)
+//			{
+//				throw new IllegalArgumentException("name is null");
+//			}
+			category.getName().toUpperCase();
 			return mapper.map(category, CategoryDto.class);
-			
 		}
 		return null;
 	}
