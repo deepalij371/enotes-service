@@ -15,6 +15,7 @@ import com.demo.entity.Category;
 import com.demo.exception.ResourceNotFoundException;
 import com.demo.repository.CategoryRepository;
 import com.demo.service.CategoryService;
+import com.demo.util.Validation;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -24,18 +25,17 @@ public class CategoryServiceImpl implements CategoryService {
 	
 	@Autowired
 	private ModelMapper mapper;
+	
+	@Autowired
+	private Validation validation;
 
 	@Override
 	public Boolean saveCategory(CategoryDto categoryDto) 
 	{ 
-//		
-//		Category category = new Category();
-//		category.setName(categoryDto.getName());
-//		category.setDescription(categoryDto.getDescription());
-//		category.setIsActive(categoryDto.getIsActive());
+
+		validation.categoryValidation(categoryDto);
 		
 		Category category = mapper.map(categoryDto, Category.class);
-		
 		
 		if(ObjectUtils.isEmpty(category.getId()))
 		{
