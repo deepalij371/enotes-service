@@ -3,7 +3,7 @@ package com.demo.service.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
+import com.demo.exception.ExitDataException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,13 @@ public class CategoryServiceImpl implements CategoryService {
 
 		validation.categoryValidation(categoryDto);
 		
+		Boolean exist = categoryRepository.existsByName(categoryDto.getName().trim());
+		
+		if(exist)
+		{
+			throw new ExitDataException("category already exits");
+		}
+		
 		Category category = mapper.map(categoryDto, Category.class);
 		
 		if(ObjectUtils.isEmpty(category.getId()))
@@ -55,6 +62,8 @@ public class CategoryServiceImpl implements CategoryService {
 		return true;
 	}
 
+	
+	
 	private void updateCategory(Category category) {
 		
 		Optional<Category> findbyId = categoryRepository.findById(category.getId());
